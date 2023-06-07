@@ -1,0 +1,13 @@
+{% extends 'flatpages/default.html' %}
+
+{% block content %}
+<h1> Новость </h1>
+<hr>
+    {# Добавляем форму, которая объединяет набор полей и будут отправляться в запросе для создания новости с помощью
+функции NewForm#}
+   <form action="" method="post">
+   {% csrf_token %}
+   {{ form.as_p }}
+   <input type="submit" value="Save" />
+   </form>
+{% endblock content %}

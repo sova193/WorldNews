@@ -1,0 +1,54 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% block title %}
+Product
+{% endblock title %}
+
+{% block content %}
+   <h1>Товар</h1>
+
+   <!-- Используем переданную из представления переменную time_now
+   и применяем к ней фильтр date. По назначению этот фильтр очень похож
+   на метод strftime у объекта datetime в Python — вывод времени
+   в указанном формате. <h3>{{ time_now }}</h3>-->
+   <h3>{{ time_now|date:'d M Y' }}</h3>
+
+   <!-- Если в переменной next_sale будет None,
+   то выведется указанный в фильтре текст -->
+   <h3> {{ next_sale|default_if_none:"Позже сообщим о распродаже!" }} </h3>
+
+   <hr>
+   {% if product %}
+       <table> <!-- Начинаем описывать таблицу -->
+           <tr> <!-- Добавляем строку -->
+               <td><h2><p style="text-align: center;"> Категория &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Название &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Цена &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Количество &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Дата завоза &nbsp; &nbsp; &nbsp; </p></h2></td>
+           </tr> <!-- Не забываем закрыть HTML-тег строки -->
+
+            <tr> <!-- Добавляем строку -->
+              <td>{{ product.category.name }}</td>
+              <td>{{ product.name}}</td>
+              <td>{{ product.price }}</td>
+              <td>{{ product.quantity }}</td>
+              <td>{{ time_now|date:'d M Y' }}</td>
+
+            </tr> <!-- Не забываем закрыть HTML-тег строки -->
+       </table> <!-- ... и таблицы -->
+       <hr>
+       <table>
+           <tr>
+               <td><h2> Описание </h2></td>
+           </tr>
+           <tr>
+               <td><p style="text-align: left;">{{ product.description }}</p></td>
+           </tr>
+       </table>
+
+   {% else %}
+       <h2>Товара нет!</h2>
+   {% endif %}
+{% endblock content %}

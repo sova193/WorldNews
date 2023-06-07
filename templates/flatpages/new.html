@@ -1,0 +1,47 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_censor %}
+
+{% block title %}
+NewsPortal
+{% endblock title %}
+
+{% block content %}
+   <h1>Статья</h1>
+
+   <h3>{{ time_now|date:'d M Y' }}</h3>
+   <h3> {{ next_sale|default_if_none:"Дальнейшая информация появится позже на портале " }} </h3>
+
+   <hr>
+   {% if new %}
+       <table> <!-- Начинаем описывать таблицу -->
+           <tr> <!-- Добавляем строку -->
+               <td><h2><p style="text-align: center;">&nbsp; &nbsp; &nbsp; Категория статьи&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p> </h2></td>
+               <td><h2><p style="text-align: center;">&nbsp; &nbsp; &nbsp; Автор&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p> </h2></td>
+               <td><h2><p style="text-align: center;">&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Название статьи&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p> </h2></td>
+               <td><h2><p style="text-align: center;">&nbsp; &nbsp; &nbsp; Дата публикации&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  </p> </h2></td>
+           </tr> <!-- Не забываем закрыть HTML-тег строки -->
+
+            <tr> <!-- Добавляем строку -->
+              <td>{{ new.news_category.article_title }}</td>
+              <td>{{ new.article_author }}</td>
+              <td>{{ new.article_title|censor }}</td>
+              <td>{{ new.sort_date_of_publication|date:'h m d M Y' }}</td>
+            </tr> <!-- Не забываем закрыть HTML-тег строки -->
+
+       </table> <!-- ... и таблицы -->
+       <hr>
+       <table>
+           <tr>
+               <td><h2><p style="text-align: center;"> Текст статьи </p></h2></td>
+           </tr>
+           <tr>
+               <td><p style="text-align: left;">{{ new.article_description|censor }}</p></td>
+           </tr>
+       </table>
+
+   {% else %}
+       <h2>Статей нет!</h2>
+   {% endif %}
+{% endblock content %}
