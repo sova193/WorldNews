@@ -29,7 +29,8 @@ urlpatterns = [
     # подключались к главному приложению с префиксом products/.
     # path('products/', include('simpleapp.urls'))
 
-    path('', include('simpleapp.urls'))    # если нам нужно создавать статью и новость отдельно
+    path('', include('simpleapp.urls')),    # если нам нужно создавать статью и новость отдельно
 
-
+    # Подключение allauth - модуль регистрации, логирования и логаут
+    path('accounts/', include('allauth.urls'))
 ]

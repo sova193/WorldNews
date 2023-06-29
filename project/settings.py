@@ -41,8 +41,23 @@ INSTALLED_APPS = [
     'django.contrib.flatpages',
     'fpages',
     'simpleapp',
-    'django_filters'
+    'django_filters',
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google'
 ]
+
+# Подключение allauth - модуль регистрации, логирования и логаут
+ACCOUNT_EMAIL_REQUIRED = True    # поле email обязательное
+ACCOUNT_UNIQUE_EMAIL = True      # уникальный email
+ACCOUNT_USERNAME_REQUIRED = False    # пользователь не уникальный
+ACCOUNT_AUTHENTICATION_METHOD = 'email'   # аутентификация будет происходить посредством электронной почты
+ACCOUNT_EMAIL_VERIFICATION = 'none'     # верификация почты отсутствует
+
+#Чтобы allauth распознал нашу форму как ту, что должна выполняться вместо формы по умолчанию, необходимо добавить
+# строчку в файл настроек проекта settings.py:
+ACCOUNT_FORMS = {'signup': 'simpleapp.forms.CommonSignupForm'}
 
 SITE_ID = 1
 
@@ -73,6 +88,16 @@ TEMPLATES = [
             ],
         },
     },
+]
+
+# Подключение allauth - модуль регистрации, логирования и логаута
+# pip install django-allauth
+AUTHENTICATION_BACKENDS = [
+    # Needed to login by username in Django admin, regardless of `allauth`.
+    'django.contrib.auth.backends.ModelBackend',
+
+    # `allauth` specific authentication methods, such as login by e-mail.
+    'allauth.account.auth_backends.AuthenticationBackend'
 ]
 
 WSGI_APPLICATION = 'project.wsgi.application'

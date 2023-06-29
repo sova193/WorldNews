@@ -1,5 +1,6 @@
 # Импортируем класс, который говорит нам о том,
 # что в этом представлении мы будем выводить список объектов из БД
+from django.shortcuts import redirect, render
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy  # импортируем для удаления новостей
 from .models import Product, NewsPortal
@@ -7,7 +8,8 @@ from datetime import datetime
 from .filters import ProductFilter, NewsFilter
 from .forms import ProductForm, NewForm  # для создания продуктов через функцию forms.py
 from django.contrib.auth.mixins import LoginRequiredMixin
-
+from django.contrib.auth.mixins import PermissionRequiredMixin
+from django.contrib.auth.models import Group
 
 
 class ProductsList(ListView):
@@ -191,6 +193,11 @@ class NewCreate(CreateView):
         new.save()
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
+
 # Авторизация пользователя для изменения данных и их обновление с помощью LoginRequiredMixin. Так же
 # прописываем settings.py переменная LOGIN_URL с возвратом на страницу после успешной авторизации. Импортируем так
 # же from django.contrib.auth.mixins import LoginRequiredMixin
@@ -213,8 +220,31 @@ class NewUpdate(LoginRequiredMixin, UpdateView):
         new.save()
         return super().form_valid(form)
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
+
 # Представление удаляющее товар.
-class NewDelete(DeleteView):
+class NewDelete(PermissionRequiredMixin, DeleteView):
+    permission_required = ('simpleapp.delete_newsportal')
+
     model = NewsPortal
     template_name = 'flatpages/new_delete.html'
     success_url = reverse_lazy('new_list')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
+        return context
+
+def upgrade_me(request):
+    user = request.user
+    author_group = Group.objects.get(name='authors')
+    if not request.user.groups.filter(name='authors').exists():
+        author_group.user_set.add(user)
+    return redirect('/profile/')
+
+def profile(request):
+    context = {'is_not_author': not request.user.groups.filter(name='authors').exists()}
+    return render(request, 'flatpages/profile.html', context)

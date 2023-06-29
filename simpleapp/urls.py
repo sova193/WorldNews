@@ -1,6 +1,7 @@
 from django.urls import path
 # Импортируем созданное нами представление
-from .views import ProductsList, ProductDetail, NewsList, NewsDetail, ProductCreate, NewCreate, NewUpdate, NewDelete
+from .views import ProductsList, ProductDetail, NewsList, NewsDetail, ProductCreate, NewCreate, NewUpdate, NewDelete, \
+   upgrade_me, profile
 
 
 urlpatterns = [
@@ -25,7 +26,7 @@ urlpatterns = [
    path('create/', ProductCreate.as_view(), name='product_create'),
 
    # Отображение всех новостей и статей
-   path('post/', NewsList.as_view()),
+   path('post/', NewsList.as_view(), name='new_list'),
    #path('post/<int:pk>', NewsDetail.as_view()),
 
    # просмотр статей и новостей подробно по id
@@ -47,5 +48,11 @@ urlpatterns = [
    path('post/new/<int:pk>/delete/', NewDelete.as_view(), name='new_delete'),
 
    # форма для удаления Статьи
-   path('post/article/<int:pk>/delete/', NewDelete.as_view(), name='new_delete')
+   path('post/article/<int:pk>/delete/', NewDelete.as_view(), name='new_delete'),
+
+   # форма для шаблона стать автором
+   path('upgrade/', upgrade_me, name='upgrade'),
+
+   # путь формы для профиля
+   path('profile/', profile, name='profile'),
 ]
