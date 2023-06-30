@@ -225,7 +225,7 @@ class NewUpdate(LoginRequiredMixin, UpdateView):
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
-# Представление удаляющее товар.
+# Представление удаляющее новость.
 class NewDelete(PermissionRequiredMixin, DeleteView):
     permission_required = ('simpleapp.delete_newsportal')
 

@@ -55,4 +55,6 @@ urlpatterns = [
 
    # путь формы для профиля
    path('profile/', profile, name='profile'),
+
+
 ]

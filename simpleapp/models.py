@@ -34,6 +34,7 @@ class Category(models.Model):
 
 #______________________________________________________________________________________________________________
 
+
 class NewsPortal(models.Model):
     sort_date_of_publication = models.DateTimeField(auto_now_add=True)
     article_title = models.CharField(max_length=50, unique=True)   # названия статьи не должны повторяться

@@ -38,10 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
+
     'django.contrib.flatpages',
     'fpages',
     'simpleapp',
     'django_filters',
+
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -149,6 +151,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
+
+#LOGIN_URL = 'templates/flatpages' переменная LOGIN_URL, то декоратор LoginRequiredMixin перенаправит пользователя
+# на страницу входа. После успешного завершения входа на сайт, сайт будет перенаправлен обратно на то представление,
+# для которого был вызван декоратор.
+
+LOGIN_URL = '/accounts/login/'   # для allauth
+LOGIN_REDIRECT_URL = '/profile/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
