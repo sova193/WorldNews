@@ -8,7 +8,7 @@ NewsPortal
 {% endblock title %}
 
 {% block content %}
-   <h1>ВСЕ НОВОСТИ</h1>
+   <h1>ВСЕ НОВОСТИ НА СЕГОДНЯ</h1>
    <h3> {{ next_sale|default_if_none:"Свежие новости каждый день!" }} </h3>
    <h3>{{ time_now|date:'d M Y' }}</h3>
 
@@ -52,7 +52,11 @@ NewsPortal
               <td>{{ new.article_title|censor }}</td>
               <td>{{ new.article_author }}</td>
               <td>{{ new.article_description|truncatechars:20|censor }}</td>
-              <td>{{ new.news_category.article_title }}</td>
+              <td>
+                  {% for category in new.news_category.all %}
+                        {{ category }}
+                  {% endfor %}
+              </td>
               <td>{{ new.sort_date_of_publication|date:'h m d M Y' }}</td>
 
             </tr> <!-- Не забываем закрыть HTML-тег строки -->

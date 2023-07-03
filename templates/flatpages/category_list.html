@@ -1,0 +1,118 @@
+<!--  наследуемся от шаблона default.html, который мы создавали для flatpages -->
+{% extends 'flatpages/default.html' %}
+
+{% load custom_censor %}
+
+{% block title %}
+NewsPortal
+{% endblock title %}
+
+{% block content %}
+
+   {% if is_not_subscriber %}
+        <p class="tex_center"><a href="{% url 'subscribe' category.id %}" class="btn btn-secondary btn-sm">Подписаться</a></p>
+
+   {% else %}
+        <p class="text-center"><a href="{% url 'unsubscribe' category.id %}" class="btn btn-secondary btn-sm">Отписаться</a></p>
+   {% endif %}
+
+
+
+
+   <h1>ВСЕ НОВОСТИ НА СЕГОДНЯ</h1>
+   <h3> {{ next_sale|default_if_none:"Свежие новости каждый день!" }} </h3>
+   <h3>{{ time_now|date:'d M Y' }}</h3>
+
+   <!-- Выводим количество товара в наличии с помощью метода news|length -->
+   <tr>
+      <h2>Число статей: {{ category_news_list|length  }} </h2>
+   </tr>
+
+   {# Добавляем форму, которая объединяет набор полей и будут отправляться в запросе #}
+   <form action="" method="get">
+       {# Переменная, которую мы передали через контекст, может сгенерировать нам форму с полями #}
+       {{ filterset.form.as_p }}
+       {# Добавим кнопку отправки данных формы #}
+       <input type="submit" value="Найти" />
+   </form>
+
+   <hr>
+
+   {% if category_news_list %}
+       <table> <!-- Начинаем описывать таблицу -->
+           <tr> <!-- Добавляем строку -->
+               <td><h2><p style="text-align: center;">Название статьи&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+               </p></h2></td>
+               <td><h2><p style="text-align: center;">Автор&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+               </p></h2></td>
+               <td><h2><p style="text-align: center;"> Текст статьи&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Категория статьи&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; </p></h2></td>
+               <td><h2><p style="text-align: center;"> Дата публикации</p></h2></td>
+           </tr> <!-- Не забываем закрыть HTML-тег строки -->
+
+             <!-- Для каждого товара будете генерироваться новая строчка,
+            т.е. новый HTML код, который указан в теле цикла.
+            При этом сам цикл работает точно так же, как и в Python.
+            product — переменная цикла, т.е. наш товар полученный из списка -->
+            {% for new in category_news_list %}
+
+            <tr> <!-- Добавляем строку -->
+             <!-- Не забываем, что переменные в шаблоне ничем не отличаются
+             от переменных в Python. Здесь также можно получать доступ к
+             полям объекта модели. Например, здесь мы выводим имя,
+             в следующем столбце описание, и т.д.  -->
+              <td>{{ new.article_title|censor }}</td>
+              <td>{{ new.article_author }}</td>
+              <td>{{ new.article_description|truncatechars:20|censor }}</td>
+
+              <td>
+                  {% for category in new.news_category.all %}
+                        <a href="{% url 'category_list' category.id %}">{{ category }}</a>
+                  {% endfor %}
+              </td>
+              <td>{{ new.sort_date_of_publication|date:'h m d M Y' }}</td>
+
+            </tr> <!-- Не забываем закрыть HTML-тег строки -->
+            {% endfor %}
+
+       </table> <!-- ... и таблицы -->
+
+   {% else %}
+       <h2>Статей нет!</h2>
+   {% endif %}
+
+    <!--{# Добавляем пагинацию на страницу #}
+
+   {# Информация о предыдущих страницах, где page_obj  — это объект, в котором содержится информация о текущей странице
+    # и имеем доступ к следующим параметрам  #}-->
+
+   {% if page_obj.has_previous %}   <!--has_previous — существует ли предыдущая страница;-->
+       <a href="?page=1">1</a>    <!--указывает на первую страницу-->
+
+       {% if page_obj.previous_page_number != 1 %}    <!--previous_page_number — номер предыдущей страницы;-->
+
+           ...
+
+           <a href="?page={{ page_obj.previous_page_number }}">{{ page_obj.previous_page_number }}</a>
+       {% endif %}
+   {% endif %}
+
+   {# Информация о текущей странице #}
+   {{ page_obj.number }}    <!--number — номер текущей страницы;-->
+
+   {# Информация о следующих страницах #}
+   {% if page_obj.has_next %}    <!--has_next — существует ли следующая страница;-->
+
+       <a href="?page={{ page_obj.next_page_number }}">{{ page_obj.next_page_number }}</a>    <!--next_page_number —
+        номер следующей страницы;-->
+       {% if paginator.num_pages != page_obj.next_page_number %}
+
+           ...
+
+           <a href="?page={{ page_obj.paginator.num_pages }}">{{ page_obj.paginator.num_pages }}</a>
+        <!--paginator.num_pages — объект paginator содержит информацию о количестве страниц в переменной num_pages.-->
+
+       {% endif %}
+   {% endif %}
+
+{% endblock content %}

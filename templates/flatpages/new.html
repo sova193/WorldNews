@@ -24,7 +24,11 @@ NewsPortal
            </tr> <!-- Не забываем закрыть HTML-тег строки -->
 
             <tr> <!-- Добавляем строку -->
-              <td>{{ new.news_category.article_title }}</td>
+              <td>
+                  {% for category in new.news_category.all %}
+                        {{ category }}
+                  {% endfor %}
+              </td>
               <td>{{ new.article_author }}</td>
               <td>{{ new.article_title|censor }}</td>
               <td>{{ new.sort_date_of_publication|date:'h m d M Y' }}</td>

@@ -5,7 +5,7 @@ register = template.Library()
 
 
 def censor(value):
-    bad_words = ['язвы', 'почек']
+    bad_words = ['обезьян', 'Мартышки']
     for word in bad_words:
         value = value.replace(word, '*' * len(word))
     return value

@@ -15,49 +15,77 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-)$*vmz!5k39jqoh&8h1ap%yx@&h5c$3!rhx1ish$@pu9873b+r'
 
-# SECURITY WARNING: don't run with debug turned on in production!
+# SECURITY WARNING: don't run with a debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*']   # - '*' Доступ ко всем хостам
-
+ALLOWED_HOSTS = ['*']  # - '*' Доступ ко всем хостам
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+
     'django.contrib.auth',
+
     'django.contrib.contenttypes',
     'django.contrib.sessions',
+
     'django.contrib.messages',
+
     'django.contrib.staticfiles',
+
     'django.contrib.sites',
 
     'django.contrib.flatpages',
     'fpages',
-    'simpleapp',
+
+    'simpleapp.apps.SimpleappConfig',
     'django_filters',
 
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
-    'allauth.socialaccount.providers.google'
+    'allauth.socialaccount.providers.google',
+
+    'django_apscheduler'
 ]
 
-# Подключение allauth - модуль регистрации, логирования и логаут
-ACCOUNT_EMAIL_REQUIRED = True    # поле email обязательное
-ACCOUNT_UNIQUE_EMAIL = True      # уникальный email
-ACCOUNT_USERNAME_REQUIRED = False    # пользователь не уникальный
-ACCOUNT_AUTHENTICATION_METHOD = 'email'   # аутентификация будет происходить посредством электронной почты
-ACCOUNT_EMAIL_VERIFICATION = 'none'     # верификация почты отсутствует
+SITE_URL = 'http://127.0.0.1:8000'  # Для отправки сигналов при появлении новой статьи или новости
 
-#Чтобы allauth распознал нашу форму как ту, что должна выполняться вместо формы по умолчанию, необходимо добавить
+EMAIL_HOST = 'smtp.yandex.ru'  # адрес сервера Google-почты для всех один и тот же
+EMAIL_PORT = 465  # порт smtp сервера тоже одинаковый
+EMAIL_HOST_USER = 'sova193'  # ваше имя пользователя, например, если ваша почта user@yandex.ru, то сюда надо
+# писать user, иными словами, это всё то что идёт до собаки
+EMAIL_HOST_PASSWORD = '************'  # пароль от почты
+EMAIL_USE_SSL = True  # Яндекс использует ssl, подробнее о том, что это, почитайте в дополнительных источниках, но
+# включать его здесь обязательно
+# здесь указываем уже свою ПОЛНУЮ почту, с которой будут отправляться письма
+DEFAULT_FROM_EMAIL = 'sova193@yandex.ru'
+
+APSCHEDULER_DATETIME_FORMAT = "N j, Y, f:s a"
+APSCHEDULER_RUN_NOW_TIMEOUT = 25
+
+ADMINS = [
+    ('sova', 'sova193@yandex.ru'),
+
+    # список всех админов в формате ('имя', 'их почта')
+]
+SERVER_EMAIL = 'sova193@yandex.ru'  # это будет у нас вместо аргумента FROM в массовой рассылке
+
+# Подключение allauth - модуль регистрации, логирования и логаут
+ACCOUNT_EMAIL_REQUIRED = True  # поле email обязательное
+ACCOUNT_UNIQUE_EMAIL = True  # уникальный email
+ACCOUNT_USERNAME_REQUIRED = False  # пользователь не уникальный
+ACCOUNT_AUTHENTICATION_METHOD = 'email'  # аутентификация будет происходить посредством электронной почты
+ACCOUNT_EMAIL_VERIFICATION = 'mandatory'  # верификация почты отсутствует
+
+# Чтобы allauth распознал нашу форму как ту, что должна выполняться вместо формы по умолчанию, необходимо добавить
 # строчку в файл настроек проекта settings.py:
 ACCOUNT_FORMS = {'signup': 'simpleapp.forms.CommonSignupForm'}
 
@@ -104,7 +132,6 @@ AUTHENTICATION_BACKENDS = [
 
 WSGI_APPLICATION = 'project.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/4.1/ref/settings/#databases
 
@@ -114,7 +141,6 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -134,7 +160,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/4.1/topics/i18n/
 
@@ -146,17 +171,16 @@ USE_I18N = True
 
 USE_TZ = True
 
-
 # Static files (css, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = 'static/'
 
-#LOGIN_URL = 'templates/flatpages' переменная LOGIN_URL, то декоратор LoginRequiredMixin перенаправит пользователя
+# LOGIN_URL = 'templates/flatpages' переменная LOGIN_URL, то декоратор LoginRequiredMixin перенаправит пользователя
 # на страницу входа. После успешного завершения входа на сайт, сайт будет перенаправлен обратно на то представление,
 # для которого был вызван декоратор.
 
-LOGIN_URL = '/accounts/login/'   # для allauth
+LOGIN_URL = '/accounts/login/'  # для allauth
 LOGIN_REDIRECT_URL = '/profile/'
 
 # Default primary key field type

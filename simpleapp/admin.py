@@ -1,11 +1,19 @@
 from django.contrib import admin
-from .models import Category, Product, NewsCategory, NewsPortal    # импортируем категории(классы из models)
+from .models import *    # импортируем категории(классы из models)
 
-# Приложение с товарами
-admin.site.register(Category)
-admin.site.register(Product)
+
+class NewsCategoryInline(admin.TabularInline):
+    model = NewsPortalCategory
+    extra = 1
+
+class NewsPortalAdmin(admin.ModelAdmin):
+    model = NewsPortal
+    inlines = (NewsCategoryInline,)
 
 # Приложение с новостями
 admin.site.register(NewsCategory)
-admin.site.register(NewsPortal)
+admin.site.register(NewsPortalCategory)
+admin.site.register(NewsPortal, NewsPortalAdmin)
+
+
 # Register your models here.
