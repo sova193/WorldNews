@@ -91,6 +91,13 @@ ACCOUNT_FORMS = {'signup': 'simpleapp.forms.CommonSignupForm'}
 
 SITE_ID = 1
 
+CELERY_BROKER_URL = 'redis://default:C5MkgzqO3h4UJB9JpQjeuRvM2CXBpQ7r@redis-13131.c256.us-east-1-2.ec2.cloud.redislabs.com:13131'   # указывает на URL брокера сообщений (Redis). По умолчанию он находится
+# на порту 6379.
+CELERY_RESULT_BACKEND = 'redis://default:C5MkgzqO3h4UJB9JpQjeuRvM2CXBpQ7r@redis-13131.c256.us-east-1-2.ec2.cloud.redislabs.com:13131'   # указывает на хранилище результатов выполнения задач.
+CELERY_ACCEPT_CONTENT = ['application/json']   # допустимый формат данных.
+CELERY_TASK_SERIALIZER = 'json'    # метод сериализации задач.
+CELERY_RESULT_SERIALIZER = 'json'   # метод сериализации результатов.
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
