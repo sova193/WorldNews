@@ -14,7 +14,9 @@ from django.contrib.auth.models import Group  # импорт созданных 
 from .models import Appointment    # рассылка сообщений
 # from django.core.mail import send_mail
 from django.core.mail import mail_admins   # импортируем функцию для массовой отправки писем админам
-
+from django.core.cache import cache  # импортируем наш кэш
+# from django.http import HttpResponse   # Для redis
+from .tasks import send_email_task   #hello, printer
 # ______________________________________________________________________________________________________________
 
 class NewsList(ListView):
@@ -89,6 +91,16 @@ class NewsDetail(LoginRequiredMixin, DetailView):
         context['next_sale'] = 'Следите за дальнейшим развитием события у нас на портале'
         return context
 
+    def get_object(self, *args, **kwargs):  # переопределяем метод получения объекта, как ни странно
+        obj = cache.get(f'NewsPortal-{self.kwargs["pk"]}', None)  # кэш очень похож на словарь, и метод get действует
+        # так же. Он забирает значение по ключу, если его нет, то забирает None.
+        # если объекта нет в кэше, то получаем его и записываем в кэш
+
+        if not obj:
+            obj = super().get_object(queryset=self.queryset)
+            cache.set(f'NewsPortal-{self.kwargs["pk"]}', obj)
+
+        return obj
 
 # Добавляем новое представление для создания новости.
 class NewCreate(PermissionRequiredMixin, CreateView):
@@ -107,6 +119,7 @@ class NewCreate(PermissionRequiredMixin, CreateView):
         elif self.request.path == '/post/article/create/':
             new.news_category_id = 2
         new.save()
+        send_email_task.delay(new.pk)
         return super().form_valid(form)
 
     def get_context_data(self, **kwargs):
@@ -141,7 +154,7 @@ class NewUpdate(PermissionRequiredMixin, UpdateView):
         context['is_not_author'] = not self.request.user.groups.filter(name='authors').exists()
         return context
 
-# Представление удаляющее товар.
+# Представление удаляющее новость.
 class NewDelete(PermissionRequiredMixin, DeleteView):
     permission_required = ('simpleapp.delete_newsportal')
 
@@ -166,17 +179,17 @@ def profile(request):
     return render(request, 'flatpages/profile.html', context)
 
 # подключаем отправку почтовых сообщений
-class AppointmentView(View):
+#class AppointmentView(View):
 #
-     def get(self, request, *args, **kwargs):
-         return render(request, 'flatpages/make_appointment.html', {})
+#     def get(self, request, *args, **kwargs):
+#         return render(request, 'flatpages/make_appointment.html', {})
 #
-     def post(self, request, *args, **kwargs):
-         appointment = Appointment(
-             date=datetime.strptime(request.POST['date'], '%Y-%m-%d'),
-             client_name=request.POST['client_name'],
-             message=request.POST['message'],
-         )
+#     def post(self, request, *args, **kwargs):
+#         appointment = Appointment(
+#             date=datetime.strptime(request.POST['date'], '%Y-%m-%d'),
+#             client_name=request.POST['client_name'],
+#             message=request.POST['message'],
+#         )
 #           appointment.save()
 #
 #         # отправляем письмо

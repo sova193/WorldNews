@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 import os
 from pathlib import Path
+import logging
+from django.conf import settings
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -97,6 +99,15 @@ CELERY_RESULT_BACKEND = 'redis://default:C5MkgzqO3h4UJB9JpQjeuRvM2CXBpQ7r@redis-
 CELERY_ACCEPT_CONTENT = ['application/json']   # допустимый формат данных.
 CELERY_TASK_SERIALIZER = 'json'    # метод сериализации задач.
 CELERY_RESULT_SERIALIZER = 'json'   # метод сериализации результатов.
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': os.path.join(BASE_DIR, 'cache_files'),  # Указываем, куда будем сохранять кэшируемые файлы! Не
+        # забываем создать папку cache_files внутри папки с manage.py!
+        # 'TIMEOUT': 300,  # добавляем стандартное время ожидания в минуту (по умолчанию это 5 минут — 300 секунд)
+    }
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -196,3 +207,98 @@ LOGIN_REDIRECT_URL = '/profile/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 STATICFILES_DIRS = [BASE_DIR / 'static']
+
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "handlers": {
+        "console": {
+            "class": "logging.StreamHandler",
+            "formatter": "verbose",
+            "filters": ["console_only"],
+        },
+        "general_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/general.log",
+            "maxBytes": 1048576,  # 1MB
+            "backupCount": 10,
+            "formatter": "simple",
+            "filters": ["email_file_only"],
+        },
+        "errors_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/errors.log",
+            "maxBytes": 1048576,  # 1MB
+            "backupCount": 10,
+            "formatter": "verbose",
+            "filters": ["email_file_only"],
+        },
+        "security_file": {
+            "class": "logging.handlers.RotatingFileHandler",
+            "filename": "logs/security.log",
+            "maxBytes": 1048576,  # 1MB
+            "backupCount": 10,
+            "formatter": "verbose",
+            "filters": ["email_file_only"],
+        },
+        "mail_admins": {
+            "class": "django.utils.log.AdminEmailHandler",
+            "include_html": True,
+            "filters": ["email_file_only"],
+        },
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console", "general_file"],
+            "level": "DEBUG",
+            "propagate": True,
+        },
+        "django.request": {
+            "handlers": ["errors_file", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.server": {
+            "handlers": ["errors_file", "mail_admins"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.template": {
+            "handlers": ["errors_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.db.backends": {
+            "handlers": ["errors_file"],
+            "level": "ERROR",
+            "propagate": False,
+        },
+        "django.security": {
+            "handlers": ["security_file"],
+            "level": "DEBUG",
+            "propagate": False,
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": "DEBUG",
+    },
+    "filters": {
+        "console_only": {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": lambda record: settings.DEBUG,
+        },
+        "email_file_only": {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": lambda record: not settings.DEBUG,
+        },
+    },
+    "formatters": {
+        "verbose": {
+            "format": "%(asctime)s %(levelname)s [%(name)s:%(lineno)s] %(message)s",
+        },
+        "simple": {
+            "format": "%(asctime)s %(levelname)s [%(module)s] %(message)s",
+        },
+    },
+}

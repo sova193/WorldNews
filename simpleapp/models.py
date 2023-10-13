@@ -2,7 +2,7 @@ from django.db import models
 from django.urls import reverse
 from datetime import datetime
 from django.contrib.auth.models import User
-
+from django.core.cache import cache
 #______________________________________________________________________________________________________________
 
 class NewsCategory(models.Model):
@@ -36,6 +36,9 @@ class NewsPortal(models.Model):
     def preview(self):
         return self.article_description[0:124] + '...'
 
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)  # сначала вызываем метод родителя, чтобы объект сохранился
+        cache.delete(f'NewsPortal-{self.pk}')  # затем удаляем его из кэша, чтобы сбросить его
 
 class NewsPortalCategory(models.Model):
     news_category = models.ForeignKey(NewsPortal, on_delete=models.CASCADE)

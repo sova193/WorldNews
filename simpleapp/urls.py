@@ -3,6 +3,8 @@ from django.urls import path
 from .views import NewsList, NewsDetail, NewCreate, NewUpdate, NewDelete, \
    upgrade_me, profile, AppointmentView, subscribe, unsubscribe, CategoryListView
 
+from django.views.decorators.cache import cache_page
+
 urlpatterns = [
    # path — означает путь.
    # В данном случае путь ко всем товарам у нас останется пустым,
@@ -19,17 +21,17 @@ urlpatterns = [
 
 
    # Отображение всех новостей и статей, где 'new_list' это класс во views
-   path('', NewsList.as_view(), name='new_list'),
+   path('', cache_page(60)(NewsList.as_view()), name='new_list'),
    #path('post/<int:pk>', NewsDetail.as_view()),
 
    # просмотр статей и новостей подробно по id(где 'post/<int:pk>' это 'post/1 или 2 или 3 ...')
    path('<int:pk>', NewsDetail.as_view(), name='new_detail'),
 
    # для создания новости через форму Новость
-   path('new/create/', NewCreate.as_view(), name='new_create'),
+   path('new/create/', cache_page(300)(NewCreate.as_view()), name='new_create'),
 
    # для создания Статьи через форму Новость
-   path('article/create/', NewCreate.as_view(), name='new_create'),
+   path('article/create/', cache_page(300)(NewCreate.as_view()), name='new_create'),
 
    # форма для обновления(добавление) Новости
    path('new/<int:pk>/update/', NewUpdate.as_view(), name='new_update'),
